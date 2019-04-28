@@ -36,15 +36,16 @@ AFRAME.registerComponent('editor-system', {
 
     const terminal = document.createElement('a-curvedimage')
     terminal.id = 'editor-terminal'
+    terminal.setAttribute('aframe-injected', '')
     terminal.setAttribute('class', 'terminal')
     terminal.setAttribute('editor-terminal', '')
     terminal.setAttribute('material', 'depthTest: false')
     terminal.setAttribute('theta-start', '150')
     terminal.setAttribute('theta-length', '60')
-    terminal.setAttribute('radius', '3')
+    terminal.setAttribute('radius', '4')
     terminal.setAttribute('height', '2')
     terminal.setAttribute('opacity', '0.8')
-    terminal.setAttribute('position', '0 2 -1')
+    terminal.setAttribute('position', '0 2 0')
 
     this.el.appendChild(terminal)
 
