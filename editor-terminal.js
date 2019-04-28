@@ -1,3 +1,57 @@
+
+AFRAME.registerComponent('editor-system', {
+  init: function () {
+    this.onKeyup = this.onKeyup.bind(this)
+  },
+
+  play: function () {
+    window.addEventListener('keyup', this.onKeyup, false)
+  },
+
+  pause: function () {
+    window.removeEventListener('keyup', this.onKeyup)
+  },
+
+  onKeyup: function (evt) {
+    const hasTerminal = document.body.querySelector('#editor-terminal')
+
+    if (hasTerminal) return
+    if (!(
+      (evt.key === 't') &&
+      evt.getModifierState('Control') &&
+      evt.getModifierState('Alt')
+    )) return
+
+    // <a-curvedimage
+    //   class="terminal"
+    //   editor-terminal
+    //   material="depthTest: false"
+    //   theta-start="150"
+    //   theta-length="60"
+    //   radius="3"
+    //   height="2"
+    //   opacity="0.8"
+    //   position="0 2 -1"
+    // ></a-curvedimage>
+
+    const terminal = document.createElement('a-curvedimage')
+    terminal.id = 'editor-terminal'
+    terminal.setAttribute('class', 'terminal')
+    terminal.setAttribute('editor-terminal', '')
+    terminal.setAttribute('material', 'depthTest: false')
+    terminal.setAttribute('theta-start', '150')
+    terminal.setAttribute('theta-length', '60')
+    terminal.setAttribute('radius', '3')
+    terminal.setAttribute('height', '2')
+    terminal.setAttribute('opacity', '0.8')
+    terminal.setAttribute('position', '0 2 -1')
+
+    this.el.appendChild(terminal)
+
+    evt.preventDefault()
+  }
+})
+
 AFRAME.registerComponent('editor-terminal', {
   dependencies: ['xterm'],
   init: function () {
@@ -21,7 +75,7 @@ AFRAME.registerComponent('editor-terminal', {
       .command('ssh', async (shell, { url }) => {
         // For use with https://github.com/RangerMauve/websocket-shell-service
 
-        if (!url) url = 'ws:localhost:8080'
+        if (!url) url = 'ws://localhost:8080'
 
         const socket = new WebSocket(url)
 
@@ -96,7 +150,7 @@ AFRAME.registerComponent('editor-terminal', {
 
         shell.env.pwd = element
       }, autoCompletePath)
-      .command('write', async (shell, [path, key, value]) => {
+      .command('write', async (shell, [path, key, value], flags) => {
         const { pwd } = shell.env
 
         if (!value) {
@@ -124,7 +178,7 @@ AFRAME.registerComponent('editor-terminal', {
           }
         } else {
           let nextId = shell.env.NEXT_NODE_ID
-          while(document.querySelector(`#e${nextId}`)) {
+          while (document.querySelector(`#e${nextId}`)) {
             nextId = ++shell.env.NEXT_NODE_ID
           }
 
@@ -132,6 +186,9 @@ AFRAME.registerComponent('editor-terminal', {
         }
 
         pwd.appendChild(element)
+      })
+      .command('exit', async () => {
+        this.el.parentNode.removeChild(this.el)
       })
 
     shell.env.pwd = document.querySelector('a-scene')
@@ -145,9 +202,8 @@ mkdir a-sphere #example-sphere\r
 cd #example-sphere\r
 write color purple\r
 write radius 0.2\r
-write position x -1
-write position y 1\r
-write position z -1\r
+write position "-1 1 -1"\r
+write click "this.setAttribute('color', 'purple')"\r
 `)
 
     shell.repl()
@@ -175,7 +231,6 @@ function getElementFolderName (element) {
   const tagName = element.tagName.toLowerCase()
   const id = element.id ? `#${element.id}` : ''
 
-  let index = Array.prototype.indexOf.call(element.parentNode.children, element)
   const classList = element.classList
   const classSuffix = [...classList].map((className) => `.${className}`).join('')
   return `${tagName}${id}${classSuffix}/`
@@ -189,7 +244,7 @@ function getElementAtPath (parent, path) {
     parent = parent.parentNode
   }
 
-  const selector = sections.join(' > ')
+  const selector = sections.filter((section) => !!section).join(' > ')
 
   if (!selector) return parent
   return parent.querySelector(selector)
