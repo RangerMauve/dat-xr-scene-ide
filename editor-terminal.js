@@ -191,6 +191,9 @@ AFRAME.registerComponent('editor-terminal', {
       .command('exit', async () => {
         this.el.parentNode.removeChild(this.el)
       })
+      .command('eval', async (shell, [command]) => {
+        await shell.printLine(eval(command))
+      })
 
     shell.env.pwd = document.querySelector('a-scene')
     shell.env.NEXT_NODE_ID = Math.round(Math.random() * 9000)
