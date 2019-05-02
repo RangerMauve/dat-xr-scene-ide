@@ -16,11 +16,13 @@ AFRAME.registerComponent('editor-system', {
     const hasTerminal = document.body.querySelector('#editor-terminal')
 
     if (hasTerminal) return
-    if (!(
+    const terminalShortcut = (
       (evt.key === 't') &&
       evt.getModifierState('Control') &&
       evt.getModifierState('Alt')
-    )) return
+    )
+    const runShortcut = (evt.key === 'r') && evt.getModifierState('Alt')
+    if (!runShortcut && !terminalShortcut) return
 
     // <a-curvedimage
     //   class="terminal"

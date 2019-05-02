@@ -15,14 +15,14 @@
   <a-plane position="0 0 -4" rotation="-90 0 0" width="4" height="4" color="#7BC8A4"></a-plane>
 
   <a-text
-    value="Press CTRL+ALT+T to open the terminal"
+    value="Press CTRL+ALT+T or ALT+R to open the terminal"
     position="0 0.5 -2"
     align="center"
     color="black"
     width="4"
   ></a-text>
 
-  <a-entity movement-controls id="player">
+  <a-entity movement-controls="speed: 0.1" jump-ability id="player">
     <a-entity
       camera
       look-controls="pointerLockEnabled: true"
